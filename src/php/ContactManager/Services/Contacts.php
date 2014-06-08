@@ -7,7 +7,7 @@ namespace ContactManager\Services;
 
 class Contacts {
 	private static function db() {
-		$db = new \mysqli('localhost', 'buch', 'buch', 'buch');
+		$db = new \mysqli('localhost', 'root', 'hedpe1981', 'buch');
 		$db->set_charset("utf8");
 		return $db;
 	}
