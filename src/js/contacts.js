@@ -14,7 +14,7 @@ $(function() {
         $("#contacts").append(contacts);
     }
     
-    $.getJSON('../php/ContactManager/Services/Contacts.php', listContacts);
+    $.getJSON('../src/php/ContactManager/Services/Contacts.php', listContacts);
     
     function showContact(id, contact) {
         var dl = $("<dl>");

@@ -11,7 +11,7 @@ use ContactManager\Services\Contacts;
 
 $contacts = new Contacts();
 
-header('Content-type: text/plain; charset=UTF-8');
+//header('Content-type: text/plain; charset=UTF-8');
 if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 		array_key_exists('contactId', $_POST)) {
 	$contactId = $_POST['contactId'];
@@ -21,5 +21,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 	$contactId = -1;
 }
 
-echo json_encode($contacts->listContacts($contactId));
+//echo json_encode($contacts->listContacts($contactId));
 
+include './templates/contacts.html';
