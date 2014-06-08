@@ -3,7 +3,7 @@
  * @copyright jsmolka 
  * @link https://github.com/onkelsmo/contactManaging
  */
-namespace Services;
+namespace ContactManager\Services;
 
 class Contacts {
 	private static function db() {
