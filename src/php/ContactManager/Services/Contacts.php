@@ -98,5 +98,73 @@ class Contacts {
 			throw $e;
 		}
 	}
+	
+	public function save($bearbeitet = array(), $neu = array()) {
+		$db = self::db();
+		try {
+			// Geänderte Einträge speichern
+			$stmt = $db->prepare("
+					UPDATE
+						eintrag e
+					INNER JOIN
+						kontakt k
+					ON
+						k.knt_id = e.knt_id
+					SET
+						e.etg_wert = ?
+					WHERE
+						etg_id = ? 
+					AND
+						k.bnz_id = ?
+					");
+			if(!$stmt) {
+				throw new SQLException($db->error, $db->errno);
+			}
+			$userId = $this->getUserId();
+			$stmt->bind_param(
+					"sii",
+					$value,
+					$insertId,
+					$userId);
+			foreach($bearbeitet as $insertId => $value) {
+				if(trim($value)) {
+					$stmt->execute();
+				}
+			}
+			$stmt->close();
+			
+			// leere Einträge löschen
+			$stmt = $db->prepare("
+					DELETE FROM
+						eintrag e
+					USING
+						eintrag e
+					INNER JOIN
+						kontakt k
+					ON
+						e.knt_id = k.knt_id
+					WHERE
+						e.etg_id = ?
+					AND
+						k.bnz_id = ?
+					");
+			if(!$stmt) {
+				throw new SQLException($db->error, $db->errno);
+			}
+			$userId = $this->getUserId();
+			$stmt->bind_param(
+					"ii",
+					$insertId,
+					$userId);
+			foreach ($bearbeitet as $insertId => $value) {
+				if(!trim($value)) {
+					$stmt->execute();
+				}
+			}
+			$stmt->close();
+		} catch (Exception $ex) {
+
+		}
+	}
 
 }
