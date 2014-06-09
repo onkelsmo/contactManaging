@@ -99,7 +99,7 @@ class Contacts {
 		}
 	}
 	
-	public function save($bearbeitet = array(), $neu = array()) {
+	public function save($bearbeitet = array(), $new = array()) {
 		$db = self::db();
 		try {
 			// Geänderte Einträge speichern
@@ -162,9 +162,72 @@ class Contacts {
 				}
 			}
 			$stmt->close();
-		} catch (Exception $ex) {
-
+			
+			// Neue Einträge einfügen
+			$stmt = $db->prepare("
+				INSERT INTO
+					eintrag (knt_id, ett_id, etg_wert)
+				SELECT
+					?, ?, ?
+				FROM
+					kontakt k
+				WHERE
+					k.knt_id = ?
+				AND
+					k.bnz_id = ?
+				AND NOT EXISTS (
+					SELECT
+						*
+					FROM
+						eintrag e
+					INNER JOIN
+						eintragstyp t
+					ON
+						e.ett_id = t.ett_id
+					WHERE
+						e.knt_id = ?
+					AND
+						e.ett_id = ?
+					AND 
+						t.ett_eindeutig)
+				");
+			if(!$stmt) {
+				throw new SQLException($db->error, $db->errno);
+			}
+			$stmt->bind_param(
+					"iisiiii",
+					$contactId,
+					$insertTypeId,
+					$value,
+					$contactId,
+					$userId,
+					$contactId,
+					$insertTypeId);
+			$inserted = array();
+			foreach($new as $contactId => $inserts) {
+				foreach($inserts as $insertTypeId => $values) {
+					foreach($values as $valueId => $value) {
+						if(trim($value)) {
+							$stmt->execute();
+							if($stmt->affected_rows > 0) {
+								$inserted[$contactId][$insertTypeId][$valueId] = $stmt->insert_id;
+							}
+						}
+					}
+				}
+			}
+			$stmt->close();
+			$db->close();
+			
+			return $inserted;
+		} catch (\Exception $e) {
+			if($stmt) {
+				$stmt->close();
+			}
+			if($db) {
+				$db->close();
+			}
+			throw $e;
 		}
 	}
-
 }
