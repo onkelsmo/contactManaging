@@ -7,12 +7,14 @@ namespace ContactManager\Services;
 
 class Contacts {
 	private $db;
+	private $userId;
 	
-	public function __construct($_db) {
+	public function __construct($_db, $_userId) {
 		$this->db = $_db;
+		$this->userId = $_userId;
 	}
 	private function getUserId() {
-		return 1;
+		return $this->userId;
 	}
 
 	public function listContacts($contactId = -1) {

@@ -19,6 +19,7 @@ class Dispatcher {
 	}
 	
 	public function handleHttpRequest() {
+		session_start();
 		$serviceName = $_GET['$service'];
 		$operationName = $_GET['$operation'];
 		$service = self::initService($serviceName);
@@ -28,9 +29,10 @@ class Dispatcher {
 			header('Content-type: text/plain; charset=UTF-8');
 			echo json_encode($result);
 		}
+		session_write_close();
 	}
 	private function initService($serviceName) {
-		require_once ("$serviceName.php");
+		//require_once ("$serviceName.php");
 		$refService = new \ReflectionClass($serviceName);
 		$refConstructor = $refService->getConstructor();
 		if(!$refConstructor) {
@@ -40,11 +42,17 @@ class Dispatcher {
 		return $refService->newInstanceArgs($initParameter);
 	}
 	private function setParams($operation) {
-		$callParam = Array();
+		$callParam = array();
 		$refParam = $operation->getParameters();
 		foreach($refParam as $p => $param) {
 			$paramName = $param->getName();
-			if($paramName == '_db') {
+			if($paramName == '_userId') {
+				if($_SESSION && array_key_exists('user', $_SESSION)) {
+					$value = $_SESSION['user']['id'];
+				} else {
+					$value = null;
+				}
+			} elseif($paramName == '_db') {
 				$value = $this->db;
 			} elseif($paramName[0] != '_'
 					&& $_SERVER['REQUEST_METHOD'] == 'POST'
