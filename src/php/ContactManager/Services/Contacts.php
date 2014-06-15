@@ -94,10 +94,9 @@ class Contacts {
 	}
 	
 	public function save($bearbeitet = array(), $new = array()) {
-		$db = self::db();
 		try {
 			// Geänderte Einträge speichern
-			$stmt = $db->prepare("
+			$stmt = $this->db->prepare("
 					UPDATE
 						eintrag e
 					INNER JOIN
@@ -112,7 +111,7 @@ class Contacts {
 						k.bnz_id = ?
 					");
 			if(!$stmt) {
-				throw new SQLException($db->error, $db->errno);
+				throw new SQLException($this->db->error, $this->db->errno);
 			}
 			$userId = $this->getUserId();
 			$stmt->bind_param(
@@ -128,7 +127,7 @@ class Contacts {
 			$stmt->close();
 			
 			// leere Einträge löschen
-			$stmt = $db->prepare("
+			$stmt = $this->db->prepare("
 					DELETE FROM
 						eintrag e
 					USING
@@ -143,7 +142,7 @@ class Contacts {
 						k.bnz_id = ?
 					");
 			if(!$stmt) {
-				throw new SQLException($db->error, $db->errno);
+				throw new SQLException($this->db->error, $this->db->errno);
 			}
 			$userId = $this->getUserId();
 			$stmt->bind_param(
@@ -158,7 +157,7 @@ class Contacts {
 			$stmt->close();
 			
 			// Neue Einträge einfügen
-			$stmt = $db->prepare("
+			$stmt = $this->db->prepare("
 				INSERT INTO
 					eintrag (knt_id, ett_id, etg_wert)
 				SELECT
@@ -186,7 +185,7 @@ class Contacts {
 						t.ett_eindeutig)
 				");
 			if(!$stmt) {
-				throw new SQLException($db->error, $db->errno);
+				throw new SQLException($this->db->error, $this->db->errno);
 			}
 			$stmt->bind_param(
 					"iisiiii",
@@ -211,15 +210,11 @@ class Contacts {
 				}
 			}
 			$stmt->close();
-			$db->close();
 			
 			return $inserted;
 		} catch (\Exception $e) {
 			if($stmt) {
 				$stmt->close();
-			}
-			if($db) {
-				$db->close();
 			}
 			throw $e;
 		}
