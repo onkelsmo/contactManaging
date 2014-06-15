@@ -33,7 +33,7 @@ class Dispatcher {
 	}
 	private function initService($serviceName) {
 		//require_once ("$serviceName.php");
-		$refService = new \ReflectionClass($serviceName);
+		$refService = new \ReflectionClass('ContactManager\Services\\'.$serviceName);
 		$refConstructor = $refService->getConstructor();
 		if(!$refConstructor) {
 			return $refService->newInstance();
