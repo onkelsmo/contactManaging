@@ -22,6 +22,9 @@ include_once '../bootstrap.php';
 //}
 //
 //echo json_encode($contacts->listContacts($contactId));
-ContactManager\Services\Dispatcher::handleHttpRequest();
 
-include './templates/contacts.html';
+//ContactManager\Services\Dispatcher::handleHttpRequest();
+
+//include './templates/contacts.html';
+$dispatcher = new ContactManager\Services\Dispatcher();
+$dispatcher->handleHttpRequest();

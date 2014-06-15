@@ -63,8 +63,11 @@ class Dispatcher {
 		return $callParam;
 	}
 	
-	private static function methodCall($service, $operation) {
-		
+	private function methodCall($service, $operation) {
+		$refService = new \ReflectionClass($service);
+		$refMethod = $refService->getMethod($operation);
+		$callParam = self::setParams($refMethod);
+		return $refMethod->invokeArgs($service, $callParam);
 	}
 }
 

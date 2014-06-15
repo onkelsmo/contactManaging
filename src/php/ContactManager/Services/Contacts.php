@@ -6,20 +6,18 @@
 namespace ContactManager\Services;
 
 class Contacts {
-	private static function db() {
-		$db = new \mysqli('localhost', 'root', 'hedpe1981', 'buch');
-		$db->set_charset("utf8");
-		return $db;
+	private $db;
+	
+	public function __construct($_db) {
+		$this->db = $_db;
 	}
-
 	private function getUserId() {
 		return 1;
 	}
 
 	public function listContacts($contactId = -1) {
-		$db = self::db();
 		try {
-			$stmt = $db->prepare("
+			$stmt = $this->db->prepare("
                     SELECT 
                         k.knt_id, 
                         t.ett_id, 
@@ -48,7 +46,7 @@ class Contacts {
                         e.etg_id
                     ");
 			if (!$stmt) {
-				throw new SQLException($db->error, $db->errno);
+				throw new SQLException($this->db->error, $this->db->errno);
 			}
 
 			$userId = $this->getUserId();
@@ -84,16 +82,12 @@ class Contacts {
 			}
 
 			$stmt->close();
-			$db->close();
 
 			$result = Array("data" => $data);
 			return $result;
 		} catch (\Exception $e) {
 			if ($stmt) {
 				$stmt->close();
-			}
-			if ($db) {
-				$db->close();
 			}
 			throw $e;
 		}
